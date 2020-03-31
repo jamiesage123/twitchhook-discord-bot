@@ -38,6 +38,24 @@ class Database extends SqliteDefaults {
     getStreamers(server) {
         return this.all("SELECT * FROM streamers WHERE server_id = ?", server.server_id);
     }
+
+    /**
+     * Get a streamers live messages
+     * @param username
+     * @returns {*}
+     */
+    getLiveMessages(username) {
+        return this.all("SELECT * FROM twitch_messages WHERE username = ?", username.toLowerCase());
+    }
+
+    /**
+     * Remove a live message
+     * @returns {Promise<Statement>}
+     * @param twitchMessage
+     */
+    removeLiveMessage(twitchMessage) {
+        return this.run("DELETE FROM twitch_messages WHERE id = ?", twitchMessage.id);
+    }
 }
 
 module.exports = Database;
