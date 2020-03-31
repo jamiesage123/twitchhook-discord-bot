@@ -5,7 +5,7 @@
 CREATE TABLE "streamers" (
      "id"	INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
      "server_id" TEXT NOT NULL,
-     "user_id"	TEXT NOT NULL,
+     "username"	TEXT NOT NULL,
      "created_at"	TEXT NOT NULL
 );
 
