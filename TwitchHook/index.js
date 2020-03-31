@@ -76,7 +76,19 @@ class TwitchHook {
      * Start the bot
      */
     start() {
-        console.log("Starting...");
+        // Get all the servers
+        this.database.getServers().then((servers) => {
+            // Loop through all the servers
+            servers.forEach((server) => {
+                // We only want to run if this server has associated a twitch channel
+                if (!_.isEmpty(server.twitch_channel_id)) {
+                    // Get all the streamers for this server
+                    this.database.getStreamers(server).then((streamers) => {
+                        // TODO: Get the Twitch status for all these streamers
+                    });
+                }
+            });
+        });
     }
 }
 

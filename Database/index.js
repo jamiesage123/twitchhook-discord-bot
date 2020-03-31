@@ -1,11 +1,14 @@
 const sqlite = require('sqlite');
+const SqliteDefaults = require('./SqliteDefaults');
 
-class Database {
+class Database extends SqliteDefaults {
     /**
      * Database constructor
      * @param databaseFile
      */
     constructor(databaseFile) {
+        super();
+
         // Database file location
         this.databaseFile = databaseFile;
 
@@ -22,20 +25,18 @@ class Database {
     }
 
     /**
-     * Run a query
-     * @param query
-     * @returns {Promise<Statement>}
+     * Get all servers
      */
-    run(query) {
-        return this.db.run(query);
+    getServers() {
+        return this.all("SELECT * FROM servers");
     }
 
     /**
-     * Migrate the database
-     * @returns {Promise<Database>}
+     * Get all streamers for a server
+     * @param server
      */
-    migrate() {
-        return this.db.migrate();
+    getStreamers(server) {
+        return this.all("SELECT * FROM streamers WHERE server_id = ?", server.server_id);
     }
 }
 
