@@ -9,12 +9,14 @@ const LiveMessage = require('./LiveMessage');
 const ListStreamersCommand = require('./Commands/ListStreamersCommand');
 const AddStreamerCommand = require('./Commands/AddStreamerCommand');
 const RemoveStreamerCommand = require('./Commands/RemoveStreamerCommand');
+const SetChannelCommand = require('./Commands/SetChannelCommand');
 
 class TwitchHook {
     commands = {
         list: ListStreamersCommand,
         add: AddStreamerCommand,
-        remove: RemoveStreamerCommand
+        remove: RemoveStreamerCommand,
+        setchannel: SetChannelCommand
     };
 
     /**
