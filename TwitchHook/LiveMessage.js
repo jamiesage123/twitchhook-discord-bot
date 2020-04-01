@@ -188,7 +188,7 @@ class LiveMessage {
                 }
             });
 
-            await this.database.run(`INSERT INTO twitch_messages (message_id, username, created_at) VALUES (?, ?, ?)`, message.id, user.name.toLowerCase(), moment().format('Y-m-d H:m:s'));
+            await this.database.run(`INSERT INTO twitch_messages (server_id, message_id, username, created_at) VALUES (?, ?, ?, ?)`, server.id, message.id, user.name.toLowerCase(), moment().format('Y-m-d H:m:s'));
         }
     }
 
