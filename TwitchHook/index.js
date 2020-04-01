@@ -7,6 +7,8 @@ const Database = require('../Database');
 const LiveMessage = require('./LiveMessage');
 
 class TwitchHook {
+    commands = {};
+
     /**
      * TwitchHook constructor
      */
@@ -46,6 +48,9 @@ class TwitchHook {
 
         // Connect the bot
         await this.connect();
+
+        // Add any discord commands
+        this.initCommands();
 
         // Start the bot
         this.start();
@@ -90,6 +95,35 @@ class TwitchHook {
         setInterval(() => {
             this.liveMessage.checkLiveMessages().catch(console.error);
         }, 15000);
+    }
+
+    /**
+     * Initialise all the bots commands
+     */
+    initCommands() {
+        this.bot.commands = new Discord.Collection();
+        this.bot.commands.set('add', 0);
+
+        // Catch the message event
+        this.bot.on('message', (message) => {
+            // Command prefix
+            let prefix = "!";
+
+            // Ensure this message starts with out prefix
+            if (message.content.startsWith(prefix)) {
+                // Fetch the arguments of the command
+                const args = message.content.split(/ +/);
+
+                // Fetch the command
+                const command = args.shift().toLowerCase().replace(prefix, '');
+
+                // Check to see if this command exists
+                if (this.commands[command] !== undefined) {
+                    // If the command exists, create the command class and execute it
+                    (new this.commands[command](this, message)).execute(...args);
+                }
+            }
+        });
     }
 }
 
