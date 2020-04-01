@@ -7,10 +7,12 @@ const Database = require('../Database');
 const LiveMessage = require('./LiveMessage');
 
 const AddStreamerCommand = require('./Commands/AddStreamerCommand');
+const RemoveStreamerCommand = require('./Commands/RemoveStreamerCommand');
 
 class TwitchHook {
     commands = {
-        add: AddStreamerCommand
+        add: AddStreamerCommand,
+        remove: RemoveStreamerCommand
     };
 
     /**
