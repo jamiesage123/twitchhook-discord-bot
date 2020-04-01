@@ -6,8 +6,12 @@ const _ = require('lodash');
 const Database = require('../Database');
 const LiveMessage = require('./LiveMessage');
 
+const AddStreamerCommand = require('./Commands/AddStreamerCommand');
+
 class TwitchHook {
-    commands = {};
+    commands = {
+        add: AddStreamerCommand
+    };
 
     /**
      * TwitchHook constructor
