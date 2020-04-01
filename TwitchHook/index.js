@@ -6,11 +6,13 @@ const _ = require('lodash');
 const Database = require('../Database');
 const LiveMessage = require('./LiveMessage');
 
+const ListStreamersCommand = require('./Commands/ListStreamersCommand');
 const AddStreamerCommand = require('./Commands/AddStreamerCommand');
 const RemoveStreamerCommand = require('./Commands/RemoveStreamerCommand');
 
 class TwitchHook {
     commands = {
+        list: ListStreamersCommand,
         add: AddStreamerCommand,
         remove: RemoveStreamerCommand
     };
