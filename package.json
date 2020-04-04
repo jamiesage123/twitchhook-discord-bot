@@ -1,7 +1,7 @@
 {
-    "name": "twitch-hook",
+    "name": "twitch-hook-discord-bot",
     "version": "1.0.0",
-    "description": "Discord bot to hook Twitch",
+    "description": "Discord bot that notifies a channel when a twitch user goes live",
     "main": "index.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
