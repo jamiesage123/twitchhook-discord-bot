@@ -6,24 +6,30 @@ class AddStreamerCommand extends TwitchHookCommand {
     /**
      * Execute the command
      */
-    execute(username) {
+    execute(...params) {
         // Ensure the username was provided
-        if (_.isEmpty(username)) {
+        if (_.isEmpty(params)) {
             return this.channel.send("Please provide a Twitch username. For example: !add DrDisrespect");
         }
 
-        // Fetch the streamer by username
-        this.twitchHook.database.all("SELECT * FROM streamers WHERE server_id = ? AND username = ?", this.message.member.guild.id, username.toLowerCase()).then((streamers) => {
-            // Ensure they are not already added
-            if (streamers.length !== 0) {
-                return this.channel.send("Streamer is already on your list!");
-            }
+        // Split the string by the "," separator to handle multiple usernames and trim any whitespaces
+        let usernames = params.map((username) => _.trim(username)).filter((username) => username.length > 0);
 
-            // Add the streamer
-            this.twitchHook.database.run("INSERT INTO streamers (server_id, username, created_at) VALUES (?, ?, ?)", this.message.member.guild.id, username.toLowerCase(), moment().format('Y-m-d H:m:s'));
+        // Loop through each username
+        usernames.forEach((username) => {
+            // Fetch the streamer by username
+            this.twitchHook.database.all("SELECT * FROM streamers WHERE server_id = ? AND username = ?", this.message.member.guild.id, username.toLowerCase()).then((streamers) => {
+                // Ensure they are not already added
+                if (streamers.length !== 0) {
+                    return this.channel.send(username + " is already on your list!");
+                }
 
-            // Send a confirmation message
-            this.channel.send("Successfully added " + username + "!");
+                // Add the streamer
+                this.twitchHook.database.run("INSERT INTO streamers (server_id, username, created_at) VALUES (?, ?, ?)", this.message.member.guild.id, username.toLowerCase(), moment().format('Y-m-d H:m:s'));
+
+                // Send a confirmation message
+                this.channel.send("Successfully added " + username + "!");
+            });
         });
     }
 }
