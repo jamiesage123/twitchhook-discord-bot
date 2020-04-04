@@ -21,7 +21,7 @@ You will need to invite the bot to your server. The bot needs at least "Send Mes
 ## Comands
 All commands are prefixed with `!twitchhook` followed by the command and its arguments (`!twitchhook add DrDisrespect`)
 
-Available commands:
+Available commands:  
 `!twitchhook setchannel` - Set the current channel as the channel to notify when a user goes live  
 `!twitchhook add [username]` - Add  a twitch user to the list of streamers that will notify to the channel  
 `!twitchhook remove [username]` - Remove a twitch streamer  
