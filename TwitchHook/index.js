@@ -136,7 +136,7 @@ class TwitchHook {
                     // If the command exists, create the command class and execute it
                     (new this.commands[command](this, message)).execute(...args);
                 } else {
-                    message.channel.send("Available commands: add, remove, list");
+                    message.channel.send("Available commands: setchannel, add, remove, list");
                 }
             }
         });
