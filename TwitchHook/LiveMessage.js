@@ -107,40 +107,49 @@ class LiveMessage {
      * @param streamers
      */
     async createMultiStreamLink(server, streamers) {
-        let channel = await this.getTwitchChannel(server);
+        // Proceed only if the server has a twitch channel
+        if (server.twitch_channel_id) {
+            let channel = await this.getTwitchChannel(server);
+            let formattedMessage = "Watch all streams at https://multistre.am/" + streamers.map((item) => item._data.user_name).join('/');
+            let skip = false;
 
-        let formattedMessage = "Watch all streams at https://multistre.am/" + streamers.map((item) => item._data.user_name).join('/');
-        let skip    = false;
+            // Delete the previous message
+            channel.fetchMessages().then((messages) => {
+                messages.forEach((message) => {
+                    if (message.content === formattedMessage) {
+                        skip = true;
+                    }
 
-        // Delete the previous message
-        channel.fetchMessages().then((messages) => {
-            messages.forEach((message) => {
-                if (message.content === formattedMessage) {
-                    skip = true;
+                    if (message.content.indexOf('https://multistre.am/') !== -1 && !skip) {
+                        message.delete();
+                    }
+                })
+
+                // Add the new message
+                if (!skip && streamers.length > 1) {
+                    setTimeout(() => {
+                        // Remove the existing multi stream link
+                        channel.send(formattedMessage);
+                    }, 3000);
                 }
-
-                if (message.content.indexOf('https://multistre.am/') !== -1 && !skip) {
-                    message.delete();
-                }
-            })
-
-            // Add the new message
-            if (!skip && streamers.length > 1) {
-                setTimeout(() => {
-                    // Remove the existing multi stream link
-                    channel.send(formattedMessage);
-                }, 3000);
-            }
-        });
+            });
+        }
     };
 
     /**
      * Get a servers twitch channel
      * @param server
-     * @returns {Channel}
+     * @returns {Channel|null}
      */
     getTwitchChannel(server) {
-        return this.bot.channels.get(server.twitch_channel_id);
+        let channel = this.bot.channels.get(server.twitch_channel_id);
+
+        // If this channel does not exist, remove it from the database
+        if (typeof channel === "undefined" || channel === null) {
+            this.database.run(`UPDATE servers SET twitch_channel_id = null WHERE id = ?`, server.id);
+        }
+
+        return channel;
     }
 
     /**
