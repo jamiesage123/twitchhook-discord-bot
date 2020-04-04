@@ -117,12 +117,12 @@ class TwitchHook {
         // Catch the message event
         this.bot.on('message', (message) => {
             // Command prefix
-            let prefix = "!";
-
+            let prefix = "!twitchhook";
+            
             // Ensure this message starts with out prefix
-            if (message.content.startsWith(prefix)) {
+            if (message.content.trim().startsWith(prefix)) {
                 // Fetch the arguments of the command
-                const args = message.content.split(/ +/);
+                const args = message.content.replace(`${prefix} `, "").split(" ");
 
                 // Fetch the command
                 const command = args.shift().toLowerCase().replace(prefix, '');
@@ -131,6 +131,8 @@ class TwitchHook {
                 if (this.commands[command] !== undefined) {
                     // If the command exists, create the command class and execute it
                     (new this.commands[command](this, message)).execute(...args);
+                } else {
+                    message.channel.send("Available commands: add, remove, list");
                 }
             }
         });
