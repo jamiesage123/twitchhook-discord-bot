@@ -2,6 +2,7 @@ require('dotenv').config();
 const moment = require('moment');
 const Discord = require('discord.js');
 const _ = require('lodash');
+const TwitchClient = require('twitch').default;
 
 const Database = require('../Database');
 const LiveMessage = require('./LiveMessage');
@@ -50,6 +51,9 @@ class TwitchHook {
             console.error("Please provide a TWITCH_CLIENT_ID inside the .env file");
         }
 
+        // Twitch client instance
+        this.twitch = TwitchClient.withClientCredentials(this.twitchClientId);
+
         // Initialise the database
         await this.database.init();
 
@@ -91,7 +95,7 @@ class TwitchHook {
         });
 
         // Create the LiveMessage instance
-        this.liveMessage = new LiveMessage(this.database, this.bot, this.twitchClientId);
+        this.liveMessage = new LiveMessage(this.database, this.bot, this.twitch);
     }
 
     /**
@@ -118,7 +122,7 @@ class TwitchHook {
         this.bot.on('message', (message) => {
             // Command prefix
             let prefix = "!twitchhook";
-            
+
             // Ensure this message starts with out prefix
             if (message.content.trim().startsWith(prefix)) {
                 // Fetch the arguments of the command

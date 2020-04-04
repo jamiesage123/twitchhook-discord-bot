@@ -1,5 +1,4 @@
 const moment = require('moment');
-const TwitchClient = require('twitch').default;
 const _ = require('lodash');
 
 class LiveMessage {
@@ -7,9 +6,9 @@ class LiveMessage {
      * LiveMessage constructor
      * @param database
      * @param bot
-     * @param twitchClientId
+     * @param twitch
      */
-    constructor(database, bot, twitchClientId) {
+    constructor(database, bot, twitch) {
         // The bot instance
         this.bot = bot;
 
@@ -17,7 +16,7 @@ class LiveMessage {
         this.database = database;
 
         // Twitch client instance
-        this.twitch = TwitchClient.withClientCredentials(twitchClientId);
+        this.twitch = twitch;
     }
 
     /**

@@ -17,18 +17,28 @@ class AddStreamerCommand extends TwitchHookCommand {
 
         // Loop through each username
         usernames.forEach((username) => {
-            // Fetch the streamer by username
-            this.twitchHook.database.all("SELECT * FROM streamers WHERE server_id = ? AND username = ?", this.message.member.guild.id, username.toLowerCase()).then((streamers) => {
-                // Ensure they are not already added
-                if (streamers.length !== 0) {
-                    return this.channel.send(username + " is already on your list!");
+            // Ensure this user exists
+            this.twitchHook.twitch.helix.users.getUserByName(username).then((res) => {
+                // Ensure the twitch user exists
+                if (res !== null) {
+                    // Fetch the streamer by username
+                    this.twitchHook.database.all("SELECT * FROM streamers WHERE server_id = ? AND username = ?", this.message.member.guild.id, username.toLowerCase()).then((streamers) => {
+                        // Ensure they are not already added
+                        if (streamers.length !== 0) {
+                            return this.channel.send(username + " is already on your list!");
+                        }
+
+                        // Add the streamer
+                        this.twitchHook.database.run("INSERT INTO streamers (server_id, username, created_at) VALUES (?, ?, ?)", this.message.member.guild.id, username.toLowerCase(), moment().format('Y-m-d H:m:s'));
+
+                        // Send a confirmation message
+                        this.channel.send("Successfully added " + username + "!");
+                    });
+                } else {
+                    this.channel.send("Could not find twitch streamer " + username);
                 }
-
-                // Add the streamer
-                this.twitchHook.database.run("INSERT INTO streamers (server_id, username, created_at) VALUES (?, ?, ?)", this.message.member.guild.id, username.toLowerCase(), moment().format('Y-m-d H:m:s'));
-
-                // Send a confirmation message
-                this.channel.send("Successfully added " + username + "!");
+            }).catch(() => {
+                this.channel.send("Could not find twitch streamer " + username);
             });
         });
     }
