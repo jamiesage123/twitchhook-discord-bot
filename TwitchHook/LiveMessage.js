@@ -58,38 +58,42 @@ class LiveMessage {
             if (!_.isEmpty(server.twitch_channel_id)) {
                 // Get all the streamers for this server
                 return this.database.getStreamers(server).then((streamers) => {
-                    console.log("Checking streamers...", streamers.map((streamer) => streamer.username));
-                    let liveStreamers = [];
+                    if (streamers.length > 0) {
+                        console.log("[TWITCH HOOK] Starting checks on " + server.server_id + " for streamers: " + streamers.map((streamer) => streamer.username).join(', '));
+                        let liveStreamers = [];
 
-                    // Get the Twitch status for all these streamers
-                    return this.twitch.helix.streams.getStreams({userName: streamers.map((streamer) => streamer.username)}).then((response) => {
-                        let promises = [];
+                        // Get the Twitch status for all these streamers
+                        return this.twitch.helix.streams.getStreams({userName: streamers.map((streamer) => streamer.username)}).then((response) => {
+                            let promises = [];
 
-                        // Loop through our streamers
-                        streamers.forEach((streamer) => {
-                            promises.push(async () => {
-                                // Find the twitch data for this streamer
-                                let data = response.data.find((item) => item._data.user_name.toLowerCase() === streamer.username.toLowerCase());
+                            // Loop through our streamers
+                            streamers.forEach((streamer) => {
+                                promises.push(async () => {
+                                    // Find the twitch data for this streamer
+                                    let data = response.data.find((item) => item._data.user_name.toLowerCase() === streamer.username.toLowerCase());
 
-                                // Determine if this user is live
-                                if (data !== undefined) {
-                                    // Add the users to the live streamers list
-                                    liveStreamers.push(data);
+                                    // Determine if this user is live
+                                    if (data !== undefined) {
+                                        // Add the users to the live streamers list
+                                        liveStreamers.push(data);
 
-                                    // Add the live message
-                                    await this.addLiveMessage(server, data);
-                                } else {
-                                    // Remove the live message
-                                    await this.removeLiveMessage(server, streamer.username);
-                                }
+                                        // Add the live message
+                                        await this.addLiveMessage(server, data);
+                                    } else {
+                                        // Remove the live message
+                                        await this.removeLiveMessage(server, streamer.username);
+                                    }
+                                });
                             });
-                        });
 
-                        // Wait for all the promises to resolve
-                        Promise.all(promises.map((fn) => fn())).finally(() => {
-                            resolve(liveStreamers);
+                            // Wait for all the promises to resolve
+                            Promise.all(promises.map((fn) => fn())).finally(() => {
+                                resolve(liveStreamers);
+                            });
+                        }).catch((e) => {
+                            console.log("[TWITCH HOOK] Twitch API error: ", e);
                         });
-                    })
+                    }
                 });
             } else {
                 // Server does not have a twitch channel, respond with an empty array
