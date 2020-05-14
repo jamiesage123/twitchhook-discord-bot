@@ -30,6 +30,9 @@ class TwitchHook {
         // Fetch the twitch client id from the environment
         this.twitchClientId = process.env.TWITCH_CLIENT_ID;
 
+        // Fetch the twitch client secret from the environment
+        this.twitchClientSecret = process.env.TWITCH_CLIENT_SECRET;
+
         // Create the bot
         this.bot =  new Discord.Client();
 
@@ -51,8 +54,13 @@ class TwitchHook {
             console.error("Please provide a TWITCH_CLIENT_ID inside the .env file");
         }
 
+        // Ensure we have a twitch client secret
+        if (_.isEmpty(this.twitchClientSecret)) {
+            console.error("Please provide a TWITCH_CLIENT_SECRET inside the .env file");
+        }
+
         // Twitch client instance
-        this.twitch = TwitchClient.withClientCredentials(this.twitchClientId);
+        this.twitch = TwitchClient.withClientCredentials(this.twitchClientId, this.twitchClientSecret);
 
         // Initialise the database
         await this.database.init();
