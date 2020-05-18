@@ -18,7 +18,7 @@ Now, run `npm run start` to start the bot.
 
 You will need to invite the bot to your server. The bot needs at least "Send Message", "Manage Messages" and "Embed Links" permissions.
 
-## Comands
+## Commands
 All commands are prefixed with `!twitchhook` followed by the command and its arguments (`!twitchhook add DrDisrespect`)
 
 Available commands:  
