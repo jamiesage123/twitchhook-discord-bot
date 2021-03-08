@@ -185,7 +185,7 @@ class LiveMessage {
 
             // Add the message
             let message = await channel.send({ embed: {
-                    title: twitchStream.title,
+                    title: `${user.displayName} is live - ${twitchStream.title}`,
                     url: `https://www.twitch.tv/${user.name}`,
                     author: {
                         name: `${user.displayName} is now live on Twitch!`,
