@@ -8,12 +8,12 @@ class RemoveStreamerCommand extends TwitchHookCommand {
      */
     execute(...params) {
         // Ensure the username was provided
-        if (_.isEmpty(params)) {
-            return this.channel.send("Please provide a Twitch username. For example: !remove DrDisrespect");
+        if (_.isEmpty(params) || (params && params.length !== 2)) {
+            return this.channel.send("Please provide a Twitch username. For example: !remove DrDisrespect twitch");
         }
 
-        // Split the string by the "," separator to handle multiple usernames and trim any whitespaces
-        let usernames = params.map((username) => _.trim(username)).filter((username) => username.length > 0);
+        let usernames = [params[0]];
+        let platform  = params[1];
 
         // Fetch the server
         this.twitchHook.database.all("SELECT * FROM servers WHERE server_id = ?", this.message.member.guild.id).then((servers) => {
@@ -22,14 +22,14 @@ class RemoveStreamerCommand extends TwitchHookCommand {
             // Loop through the usernames
             usernames.forEach((username) => {
                 // Attempt to find the streamer
-                this.twitchHook.database.all("SELECT * FROM streamers WHERE server_id = ? AND username = ?", this.message.member.guild.id, username.toLowerCase()).then((streamers) => {
+                this.twitchHook.database.all("SELECT * FROM streamers WHERE server_id = ? AND username = ? AND platform = ?", this.message.member.guild.id, username.toLowerCase(), platform.toLowerCase()).then((streamers) => {
                     // Ensure they already exist
                     if (streamers.length > 0) {
                         // Remove the streamer
                         this.twitchHook.database.run("DELETE FROM streamers WHERE server_id = ? AND username = ?", this.message.member.guild.id, username.toLowerCase());
 
                         // Remove any of the streamer messages
-                        this.twitchHook.liveMessage.removeLiveMessage(server, username);
+                        this.twitchHook.liveMessage.removeLiveMessage(server, username, platform);
 
                         // Notify the channel
                         this.channel.send("Successfully removed " + username);

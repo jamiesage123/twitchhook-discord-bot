@@ -35,8 +35,8 @@ class Database extends SqliteDefaults {
      * Get all streamers for a server
      * @param server
      */
-    getStreamers(server) {
-        return this.all("SELECT * FROM streamers WHERE server_id = ?", server.server_id);
+    getStreamers(server, platform) {
+        return this.all("SELECT * FROM streamers WHERE server_id = ? AND platform = ?", server.server_id, platform);
     }
 
     /**

@@ -1,5 +1,6 @@
 const _ = require('lodash');
 const moment = require('moment');
+const axios = require('axios');
 const TwitchHookCommand = require('./TwitchHookCommand');
 
 class AddStreamerCommand extends TwitchHookCommand {
@@ -8,39 +9,57 @@ class AddStreamerCommand extends TwitchHookCommand {
      */
     execute(...params) {
         // Ensure the username was provided
-        if (_.isEmpty(params)) {
-            return this.channel.send("Please provide a Twitch username. For example: !add DrDisrespect");
+        if (_.isEmpty(params) || (params && params.length !== 2)) {
+            return this.channel.send("Please provide a Twitch username. For example: !twitchhook add [username] [platform (twitch|youtube)]");
         }
 
-        // Split the string by the "," separator to handle multiple usernames and trim any whitespaces
-        let usernames = params.map((username) => _.trim(username)).filter((username) => username.length > 0);
+        // Get the username
+        let usernames = [_.trim(params[0])];
 
-        // Loop through each username
-        usernames.forEach((username) => {
-            // Ensure this user exists
-            this.twitchHook.twitch.helix.users.getUserByName(username).then((res) => {
-                // Ensure the twitch user exists
-                if (res !== null) {
-                    // Fetch the streamer by username
-                    this.twitchHook.database.all("SELECT * FROM streamers WHERE server_id = ? AND username = ?", this.message.member.guild.id, username.toLowerCase()).then((streamers) => {
-                        // Ensure they are not already added
-                        if (streamers.length !== 0) {
-                            return this.channel.send(username + " is already on your list!");
-                        }
+        // Determine the platform
+        let platform = _.trim(params[1]);
 
-                        // Add the streamer
-                        this.twitchHook.database.run("INSERT INTO streamers (server_id, username, created_at) VALUES (?, ?, ?)", this.message.member.guild.id, username.toLowerCase(), moment().format('Y-m-d H:m:s'));
+        // Ensure the platform is correct
+        if (['youtube', 'twitch'].indexOf(platform) !== -1) {
+            // Loop through each username
+            usernames.forEach((username) => {
+                // Ensure this user exists
+                this.checkUsername(username, platform).then((res) => {
+                    // Ensure the twitch user exists
+                    if (res !== null) {
+                        // Fetch the streamer by username
+                        this.twitchHook.database.all("SELECT * FROM streamers WHERE server_id = ? AND username = ?", this.message.member.guild.id, username.toLowerCase()).then((streamers) => {
+                            // Ensure they are not already added
+                            if (streamers.length !== 0) {
+                                return this.channel.send(username + " is already on your list!");
+                            }
 
-                        // Send a confirmation message
-                        this.channel.send("Successfully added " + username + "!");
-                    });
-                } else {
-                    this.channel.send("Could not find twitch streamer " + username);
-                }
-            }).catch(() => {
-                this.channel.send("Could not find twitch streamer " + username);
+                            // Add the streamer
+                            this.twitchHook.database.run("INSERT INTO streamers (server_id, username, platform, created_at) VALUES (?, ?, ?, ?)", this.message.member.guild.id, username.toLowerCase(), platform.toLowerCase(), moment().format('Y-m-d H:m:s'));
+
+                            // Send a confirmation message
+                            this.channel.send("Successfully added " + username + "!");
+                        });
+                    } else {
+                        this.channel.send("Could not find " + platform + " streamer " + username);
+                    }
+                }).catch(() => {
+                    this.channel.send("Could not find " + platform + " streamer " + username);
+                });
             });
-        });
+        } else {
+            this.channel.send("Invalid platform " + platform + ". Must be: twitch or youtube");
+        }
+    }
+
+    checkUsername(username, platform) {
+        if (platform === "twitch") {
+            return this.twitchHook.twitch.helix.users.getUserByName(username);
+        } else if (platform === "youtube") {
+            return axios.get(`https://www.youtube.com/${username}`);
+        }
+
+        return null;
     }
 }
 

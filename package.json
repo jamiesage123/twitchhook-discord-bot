@@ -10,11 +10,13 @@
     "author": "Jamie Sage (https://jamiesage.co.uk)",
     "dependencies": {
         "axios": "^0.19.2",
+        "cheerio": "^1.0.0-rc.6",
         "discord.js": "^11.5.1",
         "dotenv": "^8.2.0",
         "lodash": "^4.17.15",
         "moment": "^2.24.0",
         "sqlite": "^3.0.6",
+        "sqlite3": "^5.0.2",
         "twitch": "^4.0.7"
     }
 }

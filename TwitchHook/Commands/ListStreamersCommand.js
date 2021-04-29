@@ -8,7 +8,7 @@ class ListStreamersCommand extends TwitchHookCommand {
         // Fetch the streamers for this server
         this.twitchHook.database.all("SELECT * FROM streamers WHERE server_id = ?", this.message.member.guild.id).then((streamers) => {
             if (streamers.length > 0) {
-                this.channel.send("Here is a list of your current streamers: " + streamers.map((streamer) => streamer.username).join(', '));
+                this.channel.send("Here is a list of your current streamers: " + streamers.map((streamer) => `${streamer.username} (${streamer.platform})`).join(', '));
             } else {
                 this.channel.send("You don't have any streamers set up. Use the !add command to add a new one");
             }
