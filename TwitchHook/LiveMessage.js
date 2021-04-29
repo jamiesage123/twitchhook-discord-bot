@@ -136,7 +136,7 @@ class LiveMessage {
                         streamers.forEach((streamer) => {
                             promises.push(
                                 new Promise((resolve, reject) => {
-                                    axios.get(`https://www.youtube.com/${streamer.username}`).then((res) => {
+                                    axios.get(`https://www.youtube.com/${streamer.username}?hl=en`).then((res) => {
                                         let page = res.data;
                                         let parts = page.split(' watching');
 
